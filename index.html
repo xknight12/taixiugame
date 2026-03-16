@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tài Xỉu Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .game {
+      background: white;
+      width: 420px;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .money {
+      font-size: 20px;
+      margin-bottom: 16px;
+      font-weight: bold;
+      color: #2c7a2c;
+    }
+
+    .dice {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .die {
+      width: 60px;
+      height: 60px;
+      background: #fff;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .controls {
+      margin: 16px 0;
+    }
+
+    button {
+      padding: 10px 16px;
+      margin: 6px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .tai {
+      background: #ffb020;
+      color: white;
+    }
+
+    .xiu {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .roll {
+      background: #16a34a;
+      color: white;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    input {
+      width: 100px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .selected {
+      outline: 3px solid #222;
+    }
+
+    .result {
+      margin-top: 16px;
+      font-size: 18px;
+      min-height: 28px;
+      font-weight: bold;
+    }
+
+    .history {
+      margin-top: 16px;
+      text-align: left;
+      font-size: 14px;
+      max-height: 120px;
+      overflow-y: auto;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <h1>Tài Xỉu Demo</h1>
+    <div class="money">Điểm: <span id="money">100</span></div>
+
+    <div>
+      <label>Tiền cược: </label>
+      <input type="number" id="betAmount" value="10" min="1" />
+    </div>
+
+    <div class="controls">
+      <button id="taiBtn" class="tai">Chọn Tài</button>
+      <button id="xiuBtn" class="xiu">Chọn Xỉu</button>
+      <button id="rollBtn" class="roll">Lắc xúc xắc</button>
+    </div>
+
+    <div class="dice">
+      <div class="die" id="d1">-</div>
+      <div class="die" id="d2">-</div>
+      <div class="die" id="d3">-</div>
+    </div>
+
+    <div class="result" id="result">Hãy chọn Tài hoặc Xỉu</div>
+
+    <div class="history" id="history">
+      <strong>Lịch sử:</strong>
+      <div>Chưa có lượt chơi nào.</div>
+    </div>
+  </div>
+
+  <script>
+    let money = 100;
+    let choice = null;
+
+    const moneyEl = document.getElementById("money");
+    const betAmountEl = document.getElementById("betAmount");
+    const taiBtn = document.getElementById("taiBtn");
+    const xiuBtn = document.getElementById("xiuBtn");
+    const rollBtn = document.getElementById("rollBtn");
+    const resultEl = document.getElementById("result");
+    const historyEl = document.getElementById("history");
+
+    const d1 = document.getElementById("d1");
+    const d2 = document.getElementById("d2");
+    const d3 = document.getElementById("d3");
+
+    function randomDie() {
+      return Math.floor(Math.random() * 6) + 1;
+    }
+
+    function updateMoney() {
+      moneyEl.textContent = money;
+    }
+
+    function addHistory(text) {
+      const item = document.createElement("div");
+      item.textContent = text;
+      historyEl.appendChild(item);
+    }
+
+    taiBtn.addEventListener("click", () => {
+      choice = "tai";
+      taiBtn.classList.add("selected");
+      xiuBtn.classList.remove("selected");
+      resultEl.textContent = "Bạn đã chọn: Tài";
+    });
+
+    xiuBtn.addEventListener("click", () => {
+      choice = "xiu";
+      xiuBtn.classList.add("selected");
+      taiBtn.classList.remove("selected");
+      resultEl.textContent = "Bạn đã chọn: Xỉu";
+    });
+
+    rollBtn.addEventListener("click", () => {
+      const bet = parseInt(betAmountEl.value);
+
+      if (!choice) {
+        resultEl.textContent = "Bạn chưa chọn Tài hoặc Xỉu!";
+        return;
+      }
+
+      if (isNaN(bet) || bet <= 0) {
+        resultEl.textContent = "Tiền cược không hợp lệ!";
+        return;
+      }
+
+      if (bet > money) {
+        resultEl.textContent = "Bạn không đủ điểm!";
+        return;
+      }
+
+      const dice1 = randomDie();
+      const dice2 = randomDie();
+      const dice3 = randomDie();
+      const total = dice1 + dice2 + dice3;
+
+      d1.textContent = dice1;
+      d2.textContent = dice2;
+      d3.textContent = dice3;
+
+      let gameResult = "";
+      if (total >= 11) {
+        gameResult = "tai";
+      } else {
+        gameResult = "xiu";
+      }
+
+      if (choice === gameResult) {
+        money += bet;
+        resultEl.textContent = `Bạn thắng! Tổng = ${total} (${gameResult.toUpperCase()})`;
+        addHistory(`Thắng ${bet} điểm - Tổng ${total} - ${gameResult.toUpperCase()}`);
+      } else {
+        money -= bet;
+        resultEl.textContent = `Bạn thua! Tổng = ${total} (${gameResult.toUpperCase()})`;
+        addHistory(`Thua ${bet} điểm - Tổng ${total} - ${gameResult.toUpperCase()}`);
+      }
+
+      updateMoney();
+
+      if (money <= 0) {
+        resultEl.textContent = "Bạn đã hết điểm!";
+        rollBtn.disabled = true;
+      }
+    });
+
+    updateMoney();
+  </script>
+</body>
+</html>
